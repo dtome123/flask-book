@@ -1,0 +1,27 @@
+{% extends 'base.html' %} {% block content %}
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Tên sách</th>
+      <th scope="col">Số lượng</th>
+      <th scope="col">Đơn giá</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for book in books %}
+
+    <tr>
+      <th scope="row">
+        <img style="width: 50px; height: 50px" src="{{book.image}}" />
+      </th>
+      <td>{{book.name}}</td>
+      <td>{{book.quantity}}</td>
+      <td>{{book.price}}</td>
+      <td><a href="/book/{{book.id}}">Xem</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

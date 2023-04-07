@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 
-<a href="/input_book/create">
+<a href="/order/create">
   <button class="btn btn-primary">Tạo mới</button>
 </a>
 
@@ -14,12 +14,12 @@
     </tr>
   </thead>
   <tbody>
-    {% for input in list %}
+    {% for item in list %}
     <tr>
-      <td>{{input.id}}</td>
-      <td>{{input.created_date}}</td>
-      <td>{{input.staff.name}}</td>
-      <td><a href="/input_book/{{input.id}}">Xem</a></td>
+      <td>{{item.id}}</td>
+      <td>{{item.created_date}}</td>
+      <td>{{item.staff.name}}</td>
+      <td><a href="/order/{{item.id}}">Xem</a></td>
     </tr>
     {% endfor %}
   </tbody>

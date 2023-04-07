@@ -1,0 +1,51 @@
+{% extends 'base.html' %} {% block content %}
+
+<h1>Thông tin hóa đơn #{{order.id}}</h1>
+
+<div style="display: flex; gap: 100px; margin-bottom: 20px">
+  <div style="margin-top: 50px">
+    <h3>Thông tin nhân viên</h3>
+    <div>Id nhân viên: {{order.staff.id}}</div>
+    <div>Tên nhân viên: {{order.staff.name}}</div>
+    <div>Số điện thoại nhân viên: {{order.staff.phone}}</div>
+  </div>
+
+  {% if order.customer %}
+  <div style="margin-top: 50px">
+    <h3>Thông tin khách hàng</h3>
+    <div>Id khách hàng: {{order.customer.id}}</div>
+    <div>Tên khách hàng: {{order.customer.name}}</div>
+    <div>Số điện thoại khách hàng: {{order.customer.phone}}</div>
+  </div>
+  {% endif %}
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Tên sách</th>
+      <th scope="col">Số lượng</th>
+      <th scope="col">Đơn giá</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for detail in order.details %}
+
+    <tr>
+      <th scope="row">
+        <img style="width: 50px; height: 50px" src="{{detail.book.image}}" />
+      </th>
+      <td>{{detail.book.name}}</td>
+      <td>{{detail.quantity}}</td>
+      <td>{{detail.price}}</td>
+      <td><a href="/book/{{detail.book.id}}">Xem</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div><h4>Thành tiền: {{order.total_price}}</h4></div>
+
+{% endblock %}

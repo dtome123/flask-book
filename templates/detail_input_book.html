@@ -1,0 +1,36 @@
+{% extends 'base.html' %} {% block content %}
+
+<h1>Thông tin phiếu nhập sách</h1>
+
+<div>Id: #{{input.id}}</div>
+<div>Id nhân viên: {{input.staff.id}}</div>
+<div>Tên nhân viên: {{input.staff.name}}</div>
+<div>Số điện thoại nhân viên: {{input.staff.phone}}</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Tên sách</th>
+      <th scope="col">Số lượng</th>
+      <th scope="col">Tác giả</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for detail in input.details %}
+
+    <tr>
+      <th scope="row">
+        <img style="width: 50px; height: 50px" src="{{detail.book.image}}" />
+      </th>
+      <td>{{detail.book.name}}</td>
+      <td>{{detail.quantity}}</td>
+      <td>{{detail.book.author}}</td>
+      <td><a href="/book/{{detail.book.id}}">Xem</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

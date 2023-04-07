@@ -62,7 +62,7 @@
 {% endif %}
 
 <div style="display: inline-flex; gap: 25px; margin-top: 20px">
-  <form action="/input_book/create" method="post">
+  <form action="/order/create" method="post">
     <div>
       <input id="id" type="text" name="book_id" style="display: none" />
     </div>
@@ -109,7 +109,7 @@
       <button
         type="submit"
         class="btn btn-primary"
-        style="height: 55px; margin-top: 15px; width: 100px"
+        style="height: 55px; margin-top: 15px; width: 250px"
       >
         Add
       </button>
@@ -117,34 +117,46 @@
   </form>
 </div>
 
-<div>
-  <div style="margin-top: 50px">
-    <h2 class="text-center">Phiếu đặt sách</h2>
-    <div>
-      <a href="/input_book/clear"
-        ><button type="button" class="btn btn-danger">Làm mới</button></a
-      >
+<div style="margin-top: 150px">
+  <form action="/order/create/submit" method="post">
+    <div style="display: flex; justify-content: space-between">
+      <div>
+        <label for="">Mã khách hàng</label>
+        <input type="text" name="customer_id" />
+      </div>
+
+      <div>
+        <a href="/order/clear"
+          ><button type="button" class="btn btn-danger">Làm mới</button></a
+        >
+      </div>
     </div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Tên</th>
-          <th scope="col">Thể loại</th>
-          <th scope="col">Số lượng</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in cart %}
-        <tr>
-          <td>{{item.book.name}}</td>
-          <td>{{item.book.author}}</td>
-          <td>{{item.quantity}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  <form action="/input_book/create/submit" method="post">
+    <div style="margin-top: 50px">
+      <h2 class="text-center">Hóa đơn</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Tên</th>
+            <th scope="col">Thể loại</th>
+            <th scope="col">Số lượng</th>
+            <th scope="col">Đơn giá</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart %}
+          <tr>
+            <td>{{item.book.name}}</td>
+            <td>{{item.book.author}}</td>
+            <td>{{item.quantity}}</td>
+            <td>{{item.book.price}}</td>
+          </tr>
+
+          {% endfor %}
+        </tbody>
+      </table>
+      <div>Tổng cộng: {{sum}}</div>
+    </div>
+
     <button
       class="btn btn-success"
       style="height: 55px; margin-top: 15px; width: 100px"

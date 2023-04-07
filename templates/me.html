@@ -1,0 +1,42 @@
+{% extends 'base.html' %} {% block content %}
+
+<h1>Tài khoản của tôi</h1>
+<div style="display: flex; justify-content: start; gap: 100px">
+  <div>
+    <img
+      style="border-radius: 50%; height: 200px; width: 200px"
+      src="{{staff.avatar}}"
+      alt=""
+    />
+  </div>
+  <div>
+    <div>
+      <label style="font-size: 25px; width: 220px; font-weight: bold" for=""
+        >ID:
+      </label>
+      <span style="font-size: 25px">{{staff.id}}</span>
+    </div>
+
+    <div>
+      <label style="font-size: 25px; width: 220px; font-weight: bold" for=""
+        >Họ và tên:
+      </label>
+      <span style="font-size: 25px">{{staff.name}}</span>
+    </div>
+
+    <div>
+      <label style="font-size: 25px; width: 220px; font-weight: bold" for=""
+        >Số điện thoại:
+      </label>
+      <span style="font-size: 25px">{{staff.phone}}</span>
+    </div>
+
+    <div>
+      <label style="font-size: 25px; width: 220px; font-weight: bold" for=""
+        >Địa chỉ:
+      </label>
+      <span style="font-size: 25px">{{staff.address}}</span>
+    </div>
+  </div>
+</div>
+{% endblock %}

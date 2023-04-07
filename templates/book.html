@@ -1,0 +1,22 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container">
+  <div>
+    <h3 class="text-center">Thông tin chi tiết</h3>
+    <div>
+      <img style="width: 150px; height: 150px" src="{{book.image}}" />
+    </div>
+    <div>
+      <p>Tên sách: {{book.name}}</p>
+    </div>
+    <div>
+      <p>Số lượng: {{book.quantity}}</p>
+    </div>
+    <div>
+      <p>Đơn giá: {{book.price}}</p>
+    </div>
+    <div>
+      <p>Tác giả: {{book.author}}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
