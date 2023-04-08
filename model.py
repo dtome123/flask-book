@@ -1,9 +1,20 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import Column, String, Integer, Float, ForeignKey, Text, DateTime
 from sqlalchemy.orm import relationship
 from flask_login import UserMixin
+import enum
 
 from app import db
+
+
+class OrderStatus(enum.Enum):
+    PENDING = 0
+    COMPLETED = 1
+
+
+class OrderType(enum.Enum):
+    ONLINE = 0
+    OFFLINE = 1
 
 
 class Customer(db.Model):
@@ -66,11 +77,16 @@ class Order (db.Model):
     created_date = Column(DateTime, default=datetime.now())
     updated_date = Column(DateTime, default=datetime.now())
     total_price = Column(Float, default=0)
+    status = Column(Integer, default=OrderStatus.PENDING.value)
+    type = Column(Integer, default=OrderType.OFFLINE.value)
 
     details = relationship('OrderDetail', backref='order', lazy=True)
 
     staff = relationship(Staff)
     customer = relationship(Customer)
+
+    def isCancel(self):
+        return self.status == OrderStatus.PENDING.value and (self.created_date + timedelta(hours=48)) < datetime.now()
 
 
 class OrderDetail (db.Model):

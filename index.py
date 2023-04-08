@@ -1,6 +1,6 @@
 from flask import render_template, jsonify, session, request, redirect
 from app import app, login
-from dao import list_books, get_staff_by_id, auth_user, get_book, list_input_books, create_input_book, get_input_book, create_order, list_orders, get_order
+from dao import list_books, get_staff_by_id, auth_user, get_book, list_input_books, create_input_book, get_input_book, create_order, list_orders, get_order, list_customer_orders, get_customer_order, create_customer_order, complete_customer_order
 from flask_login import login_user, logout_user, current_user, login_required, login_manager
 from model import Book
 
@@ -64,6 +64,7 @@ def get_me():
 
 
 @app.route('/input_book/create', methods=['POST'])
+@login_required
 def input_book_create_post():
 
     id = request.form['book_id']
@@ -112,6 +113,7 @@ def input_book_create_post():
 
 
 @app.route('/input_book/create')
+@login_required
 def input_book_create():
 
     books = list_books()
@@ -124,6 +126,7 @@ def input_book_create():
 
 
 @app.route('/input_book/clear')
+@login_required
 def clear_input_book():
     if 'input_book' in session:
         del session["input_book"]
@@ -131,6 +134,7 @@ def clear_input_book():
 
 
 @app.route('/input_book/create/submit', methods=['POST'])
+@login_required
 def input_book_create_submit():
     cart = session["input_book"]
 
@@ -144,6 +148,7 @@ def input_book_create_submit():
 
 
 @app.route('/input_book/<int:id>')
+@login_required
 def view_detail_input_book(id):
     res = get_input_book(id)
 
@@ -151,6 +156,7 @@ def view_detail_input_book(id):
 
 
 @app.route('/input_book')
+@login_required
 def view_list_input_book():
     res = list_input_books()
 
@@ -160,6 +166,7 @@ def view_list_input_book():
 
 
 @app.route('/order/create', methods=['POST'])
+@login_required
 def order_create_post():
 
     id = request.form['book_id']
@@ -205,6 +212,7 @@ def order_create_post():
 
 
 @app.route('/order/create')
+@login_required
 def order_create():
 
     books = list_books()
@@ -221,6 +229,7 @@ def order_create():
 
 
 @app.route('/order/clear')
+@login_required
 def clear_order():
     if 'order' in session:
         del session["order"]
@@ -228,6 +237,7 @@ def clear_order():
 
 
 @app.route('/order/create/submit', methods=['POST'])
+@login_required
 def order_create_submit():
     cart = session["order"]
 
@@ -243,6 +253,7 @@ def order_create_submit():
 
 
 @app.route('/order/<int:id>')
+@login_required
 def view_detail_order(id):
     res = get_order(id)
 
@@ -250,10 +261,105 @@ def view_detail_order(id):
 
 
 @app.route('/order')
+@login_required
 def view_list_order():
     res = list_orders()
 
     return render_template('list_order.html', list=res)
+
+############################################# CUSTOMER ORDER ########################################
+
+
+@app.route('/customer_order/create', methods=['POST'])
+@login_required
+def customer_order_create_post():
+
+    id = request.form['book_id']
+
+    # Lấy thông tin sách từ DB
+    book = get_book(id)
+
+    quantity = request.form['quantity']
+    books = []
+
+    # Kiểm tra danh sách sách customer_order đã lưu trên session chưa
+    if 'customer_order' in session:
+        items = session["customer_order"]
+
+        # Kiểm tra sách theo id trả về có trong db không, nếu không có báo lỗi không tìm thấy
+        if book is None:
+            list = list_books()
+            return render_template('create_customer_order.html', books=list, cart=items, error="Không tìm thấy sách này")
+
+        # kiểm tra sách này đã có trong giỏ hàng chưa nếu có thì tăng số lượng
+        is_exist = False
+        for item in items:
+            if item["book"].id == int(id):
+                item["quantity"] += int(quantity)
+                is_exist = True
+
+            books.append(item)
+
+        # Nếu sách này chưa có trong giỏ hàng thì thêm vào
+        if not is_exist:
+            books.append({"book": book, "quantity": int(quantity)})
+    else:
+        if book:
+            books.append({"book": book, "quantity": int(quantity)})
+        else:
+            list = list_books()
+            return render_template('create_customer_order.html', books=list, cart=[], error="Không tìm thấy sách này")
+
+    if books.__len__() > 0:
+        session["customer_order"] = books
+
+    return redirect('/customer_order/create')
+
+
+@app.route('/customer_order/create')
+@login_required
+def customer_order_create():
+
+    books = list_books()
+
+    cart = []
+    sum = 0
+    if 'customer_order' in session:
+        cart = session["customer_order"]
+
+        for item in cart:
+            sum += item["book"].price * item["quantity"]
+
+    return render_template('create_customer_order.html', books=books, cart=cart, sum=sum)
+
+
+@app.route('/customer_order/clear')
+@login_required
+def clear_customer_order():
+    if 'customer_order' in session:
+        del session["customer_order"]
+    return redirect('/customer_order/create')
+
+
+@app.route('/customer_order/create/submit', methods=['POST'])
+@login_required
+def customer_order_create_submit():
+    cart = session["customer_order"]
+
+    customer_id = request.form['customer_id']
+
+    customer_order = create_customer_order(cart, customer_id)
+
+    del session["customer_order"]
+
+    return redirect('/order/'+str(customer_order.id))
+
+
+@app.route('/order/complete/<int:id>')
+@login_required
+def process_complete_customer_order(id):
+    complete_customer_order(id)
+    return redirect('/order')
 
 
 @login.user_loader

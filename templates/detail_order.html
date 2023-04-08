@@ -3,19 +3,32 @@
 <h1>Thông tin hóa đơn #{{order.id}}</h1>
 
 <div style="display: flex; gap: 100px; margin-bottom: 20px">
+  {% if order.staff %}
   <div style="margin-top: 50px">
     <h3>Thông tin nhân viên</h3>
     <div>Id nhân viên: {{order.staff.id}}</div>
     <div>Tên nhân viên: {{order.staff.name}}</div>
     <div>Số điện thoại nhân viên: {{order.staff.phone}}</div>
   </div>
-
-  {% if order.customer %}
+  {% endif %} {% if order.customer %}
   <div style="margin-top: 50px">
     <h3>Thông tin khách hàng</h3>
     <div>Id khách hàng: {{order.customer.id}}</div>
     <div>Tên khách hàng: {{order.customer.name}}</div>
     <div>Số điện thoại khách hàng: {{order.customer.phone}}</div>
+    <div>
+      Trạng thái: 
+      {% if order.status == 1 %} 
+        Hoàn thành 
+      {% else %} 
+        {% if order.isCancel() %}
+          Đã hủy
+        {% else %}
+          Đang xử lý 
+        {% endif %}
+        
+      {% endif %}
+    </div>
   </div>
   {% endif %}
 </div>
@@ -46,6 +59,8 @@
   </tbody>
 </table>
 
-<div><h4>Thành tiền: {{order.total_price}}</h4></div>
+<div>
+  <h4>Thành tiền: {{order.total_price}}</h4>
+</div>
 
 {% endblock %}

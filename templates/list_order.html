@@ -10,6 +10,8 @@
       <th scope="col">#id</th>
       <th scope="col">Ngày tạo</th>
       <th scope="col">Nhân viên</th>
+      <th scope="col">Khách hàng</th>
+      <th scope="col">Trạng thái</th>
       <th></th>
     </tr>
   </thead>
@@ -19,7 +21,32 @@
       <td>{{item.id}}</td>
       <td>{{item.created_date}}</td>
       <td>{{item.staff.name}}</td>
-      <td><a href="/order/{{item.id}}">Xem</a></td>
+      <td>{{item.customer.name}}</td>
+      <td>
+        {% if item.status == 1 %} 
+         Hoàn thành 
+        {% else %} 
+          {% if item.isCancel() %}
+            Đã hủy
+          {% else %}
+            Đang xử lý 
+          {% endif %}
+        
+        {% endif %}
+      </td>
+      <td>
+        <a href="/order/{{item.id}}">Xem</a>
+        {% if item.status == 0 and item.isCancel() == False %}
+        <a href="/order/complete/{{item.id}}">
+          <button
+            class="btn btn-success"
+            style="margin-left: 10px; height: 35px"
+          >
+            Hoàn thành
+          </button>
+        </a>
+        {% endif %}
+      </td>
     </tr>
     {% endfor %}
   </tbody>

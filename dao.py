@@ -1,5 +1,5 @@
 from app import db
-from model import Book, InputBook, InputBook_Book, Staff, Order, OrderDetail
+from model import Book, InputBook, InputBook_Book, Staff, Order, OrderDetail, OrderType, OrderStatus
 
 
 def get_staff_by_id(staff_id):
@@ -20,6 +20,18 @@ def get_book(book_id):
 def list_books():
     books = Book.query.all()
     return books
+
+
+def add_quantity_book(book_id, quantity):
+    book = Book.query.get(book_id)
+    book.quantity = book.quantity+quantity
+    db.session.commit()
+
+
+def subtract_quantity_book(book_id, quantity):
+    book = Book.query.get(book_id)
+    book.quantity = book.quantity-quantity
+    db.session.commit()
 
 
 def list_input_books():
@@ -46,6 +58,8 @@ def create_input_book(list, staff_id):
             quantity=item["quantity"]
         ))
 
+        add_quantity_book(item["book"].id, item["quantity"])
+
     db.session.add_all(detail)
     db.session.commit()
 
@@ -64,7 +78,8 @@ def get_order(order_id):
 
 
 def create_order(list, staff_id, customer_id):
-    order = Order(staff_id=staff_id)
+    order = Order(staff_id=staff_id, type=OrderType.ONLINE.value,
+                  status=OrderStatus.COMPLETED.value)
     if customer_id:
         order.customer_id = customer_id
 
@@ -89,3 +104,53 @@ def create_order(list, staff_id, customer_id):
     db.session.commit()
 
     return order
+
+############################### CUSTOMER ORDER ##############################
+
+
+def list_customer_orders():
+    orders = Order.query.all()
+    return orders
+
+
+def get_customer_order(order_id):
+    order = Order.query.get(order_id)
+    return order
+
+
+def create_customer_order(list, customer_id):
+    order = Order(type=OrderType.OFFLINE.value,
+                  status=OrderStatus.PENDING.value)
+    if customer_id:
+        order.customer_id = customer_id
+
+    db.session.add(order)
+    db.session.commit()
+
+    total_price = 0
+    detail = []
+    for item in list:
+        print(item["book"].id, item["quantity"])
+        detail.append(OrderDetail(
+            book_id=item["book"].id,
+            order_id=order.id,
+            quantity=item["quantity"],
+            price=item["book"].price
+        ))
+        total_price += item["book"].price * item["quantity"]
+
+    order.total_price = total_price
+
+    db.session.add_all(detail)
+    db.session.commit()
+
+    return order
+
+
+def complete_customer_order(id):
+    order = get_customer_order(order_id=id)
+    order.status = OrderStatus.COMPLETED.value
+    db.session.commit()
+
+    for item in order.details:
+        subtract_quantity_book(item.book.id, item.quantity)
